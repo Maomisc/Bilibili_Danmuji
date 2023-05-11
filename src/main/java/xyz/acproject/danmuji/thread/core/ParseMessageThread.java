@@ -22,16 +22,14 @@ import xyz.acproject.danmuji.entity.superchat.SuperChat;
 import xyz.acproject.danmuji.enums.ListPeopleShieldStatus;
 import xyz.acproject.danmuji.enums.ShieldGift;
 import xyz.acproject.danmuji.file.GuardFileTools;
+import xyz.acproject.danmuji.http.HttpRoomData;
 import xyz.acproject.danmuji.http.HttpUserData;
 import xyz.acproject.danmuji.returnJson.WsPackage;
 import xyz.acproject.danmuji.service.SetService;
 import xyz.acproject.danmuji.thread.FollowShieldThread;
 import xyz.acproject.danmuji.thread.GiftShieldThread;
 import xyz.acproject.danmuji.thread.WelcomeShieldThread;
-import xyz.acproject.danmuji.tools.CurrencyTools;
-import xyz.acproject.danmuji.tools.ParseIndentityTools;
-import xyz.acproject.danmuji.tools.ParseSetStatusTools;
-import xyz.acproject.danmuji.tools.ShieldGiftTools;
+import xyz.acproject.danmuji.tools.*;
 import xyz.acproject.danmuji.utils.JodaTimeUtils;
 import xyz.acproject.danmuji.utils.SpringUtils;
 
@@ -1009,12 +1007,16 @@ public class ParseMessageThread extends Thread {
 
                         // 直播超管被切断
                         case "CUT_OFF":
-                            //					LOGGER.info("很不幸，本房间直播被切断:::" + message);
+//                            Thread.sleep(1000 * 80);
+//                            HttpRoomData.httpPostStartLive();
+//                            ShellExecutor shellExecutor = new ShellExecutor();
+//                            shellExecutor.shellExecutor();
+                            LOGGER.info("很不幸，本房间直播被切断:::" + message);
                             break;
 
                         // 本房间已被封禁
                         case "ROOM_LOCK":
-                            //					LOGGER.info("很不幸，本房间已被封禁:::" + message);
+                            LOGGER.info("很不幸，本房间已被封禁:::" + message);
                             break;
 
                         // 直播准备中(或者是关闭直播)

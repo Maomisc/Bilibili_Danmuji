@@ -30,6 +30,7 @@ import xyz.acproject.danmuji.service.ClientService;
 import xyz.acproject.danmuji.service.SetService;
 import xyz.acproject.danmuji.tools.CurrencyTools;
 import xyz.acproject.danmuji.tools.ParseSetStatusTools;
+import xyz.acproject.danmuji.tools.ShellExecutor;
 import xyz.acproject.danmuji.utils.FastJsonUtils;
 import xyz.acproject.danmuji.utils.QrcodeUtils;
 import xyz.acproject.danmuji.utils.SchedulingRunnableUtil;
@@ -54,6 +55,8 @@ import java.util.stream.Collectors;
 public class WebController {
     private SetService checkService;
     private ClientService clientService;
+    @Resource
+    private ShellExecutor shellExecutor;
     @Resource
     private DanmujiInitConfig danmujiInitConfig;
     private TaskRegisterComponent taskRegisterComponent;
@@ -502,6 +505,29 @@ public class WebController {
             return Response.success(1, req);
         }
         return Response.success(0, req);
+    }
+
+
+
+    /**
+     * @Author: zhou
+     * @Description: 测试任务
+     * @param
+     * @Data: 2023-05-11
+     * @return: xyz.acproject.danmuji.returnJson.Response<?>
+     */
+    @ResponseBody
+    @PostMapping(value = "/testTheTask")
+    public Response<?> testTheTask() {
+        LOGGER.info("测试任务开始");
+        HttpRoomData.httpPostStartLive();
+        try {
+            Thread.sleep(1000 * 3);
+        } catch (InterruptedException e) {
+            e.printStackTrace();
+        }
+        shellExecutor.shellExecutor();
+        return null;
     }
 
     @Autowired

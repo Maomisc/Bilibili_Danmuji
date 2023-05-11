@@ -3,6 +3,8 @@ package xyz.acproject.danmuji.http;
 import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONArray;
 import com.alibaba.fastjson.JSONObject;
+import lombok.Data;
+import okhttp3.Response;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
@@ -14,6 +16,7 @@ import xyz.acproject.danmuji.entity.view.RoomGift;
 import xyz.acproject.danmuji.tools.CurrencyTools;
 import xyz.acproject.danmuji.utils.OkHttp3Utils;
 
+import java.io.IOException;
 import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
 
@@ -583,4 +586,57 @@ public class HttpRoomData {
 		}
 		return roomBlocks;
 	}
+
+
+
+
+	/**
+	 * @Author: zhou
+	 * @Description: 直播开播请求
+	 * @param
+	 * @Data: 2023-05-07
+	 * @return: void
+	 */
+	public static void httpPostStartLive() {
+		JSONObject jsonObject = null;
+		String data = null;
+		Map<String, String> headers = null;
+		Map<String, String> params = null;
+		if (PublicDataConf.COOKIE == null)
+			return;
+		headers = new HashMap<>(4);
+		headers.put("user-agent",
+				"Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/81.0.4044.138 Safari/537.36");
+		headers.put("referer", "https://link.bilibili.com/p/center/index?spm_id_from=333.1007.0.0");
+		if (!StringUtils.isEmpty(PublicDataConf.USERCOOKIE)) {
+			headers.put("cookie", PublicDataConf.USERCOOKIE);
+		}
+		params = new HashMap<>(4);
+		params.put("room_id", String.valueOf(PublicDataConf.ROOMID));
+		params.put("platform", "pc");
+		params.put("area_v2", "33");
+		params.put("csrf_token", PublicDataConf.COOKIE.getBili_jct());
+		params.put("csrf", PublicDataConf.COOKIE.getBili_jct());
+		try {
+			data = OkHttp3Utils.getHttp3Utils()
+					.httpPostForm("https://api.live.bilibili.com/room/v1/Room/startLive", headers, params).body()
+					.string();
+		} catch (Exception e) {
+			LOGGER.error(e);
+			data = null;
+		}
+		if (data == null)
+			return;
+		jsonObject = JSONObject.parseObject(data);
+		int code = jsonObject.getIntValue("code");
+		if (code == 0) {
+			LOGGER.info("开播请求发送成功");
+		} else {
+			LOGGER.error("开播请求发送失败" + jsonObject.toString());
+		}
+		LOGGER.info("请求参数params:" + params);
+	}
+
+
+
 }

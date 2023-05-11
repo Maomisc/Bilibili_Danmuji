@@ -28,3 +28,4 @@ server:
 
 danmuji:
   version: 2.6.4
+  url: /home/zbo/kplayer0.5.7/kplayerStart.sh
