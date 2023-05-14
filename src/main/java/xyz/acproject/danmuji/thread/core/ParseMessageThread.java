@@ -33,6 +33,7 @@ import xyz.acproject.danmuji.tools.*;
 import xyz.acproject.danmuji.utils.JodaTimeUtils;
 import xyz.acproject.danmuji.utils.SpringUtils;
 
+import javax.annotation.Resource;
 import java.util.HashSet;
 import java.util.Map;
 import java.util.Vector;
@@ -55,6 +56,9 @@ public class ParseMessageThread extends Thread {
     private ThreadComponent threadComponent = SpringUtils.getBean(ThreadComponent.class);
     private HashSet<ThankGiftRuleSet> thankGiftRuleSets;
     private CenterSetConf centerSetConf;
+
+    @Resource
+    private ShellExecutor shellExecutor;
 
 
     @Override
@@ -229,17 +233,22 @@ public class ParseMessageThread extends Thread {
                                     //弹幕关闭
                                 }
                                 //自动回复姬处理
+                                //表情不回复
+
                                 if (PublicDataConf.autoReplyThread != null && !PublicDataConf.autoReplyThread.FLAG) {
                                     if (!PublicDataConf.autoReplyThread.getState().toString().equals("TIMED_WAITING")) {
                                         if (parseAutoReplySetting(barrage)) {
-                                            PublicDataConf.replys.add(
-                                                    AutoReply.getAutoReply(barrage.getUid(), barrage.getUname(), barrage.getMsg()));
-                                            synchronized (PublicDataConf.autoReplyThread) {
-                                                PublicDataConf.autoReplyThread.notify();
+                                            if (!is_emoticon) {
+                                                PublicDataConf.replys.add(
+                                                        AutoReply.getAutoReply(barrage.getUid(), barrage.getUname(), barrage.getMsg()+'1'));
+                                                }
+                                                synchronized (PublicDataConf.autoReplyThread) {
+                                                    PublicDataConf.autoReplyThread.notify();
                                             }
                                         }
                                     }
                                 }
+
                                 stringBuilder.delete(0, stringBuilder.length());
                                 //						LOGGER.info("弹幕信息：" + message);
                             } else {
@@ -1007,11 +1016,16 @@ public class ParseMessageThread extends Thread {
 
                         // 直播超管被切断
                         case "CUT_OFF":
-//                            Thread.sleep(1000 * 80);
-//                            HttpRoomData.httpPostStartLive();
-//                            ShellExecutor shellExecutor = new ShellExecutor();
-//                            shellExecutor.shellExecutor();
                             LOGGER.info("很不幸，本房间直播被切断:::" + message);
+
+                            try {
+                                Thread.sleep(1000 * 70);
+                            } catch (InterruptedException e) {
+                                e.printStackTrace();
+                            }
+                            HttpRoomData.httpPostStartLive();
+                            shellExecutor.shellExecutor();
+                            LOGGER.info("本房间直播重启成功:::");
                             break;
 
                         // 本房间已被封禁

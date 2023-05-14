@@ -12,6 +12,9 @@ import org.springframework.util.DigestUtils;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 import xyz.acproject.danmuji.component.TaskRegisterComponent;
+import xyz.acproject.danmuji.component.global.GlobalPropertieList;
+import xyz.acproject.danmuji.component.global.GlobalProperties;
+import xyz.acproject.danmuji.component.global.GlobalProperty;
 import xyz.acproject.danmuji.conf.CenterSetConf;
 import xyz.acproject.danmuji.conf.PublicDataConf;
 import xyz.acproject.danmuji.conf.set.*;
@@ -57,6 +60,8 @@ public class WebController {
     private ClientService clientService;
     @Resource
     private ShellExecutor shellExecutor;
+//    @Resource
+//    private GlobalProperties globalProperties;
     @Resource
     private DanmujiInitConfig danmujiInitConfig;
     private TaskRegisterComponent taskRegisterComponent;
@@ -518,16 +523,44 @@ public class WebController {
      */
     @ResponseBody
     @PostMapping(value = "/testTheTask")
-    public Response<?> testTheTask() {
+    public String testTheTask() throws IOException {
         LOGGER.info("测试任务开始");
-        HttpRoomData.httpPostStartLive();
-        try {
-            Thread.sleep(1000 * 3);
-        } catch (InterruptedException e) {
-            e.printStackTrace();
+//        HttpRoomData.httpPostStartLive();
+//        try {
+//            Thread.sleep(1000 * 3);
+//        } catch (InterruptedException e) {
+//            e.printStackTrace();
+//        }
+//        shellExecutor.shellExecutor();
+        String replyString = null;
+        int numOfProperties = GlobalProperties.getProperties().size();
+        int index = 0;
+        while (replyString == null && index < numOfProperties) {
+            replyString = HttpRoomData.sendPost("你是？", GlobalProperties.getProperties().get(index).getUrl(), GlobalProperties.getProperties().get(index).getHost());
+            index++;
         }
-        shellExecutor.shellExecutor();
-        return null;
+
+        if(replyString == null) { // 所有参数都测试过了，replyString仍为null
+            replyString = "";
+        }
+
+        return replyString;
+    }
+    /**
+     * @Author: zhou
+     * @Description:
+     * @param globalPropertieList 修改chatgpt地址
+     * @Data: 2023-05-14
+     * @return: java.util.List<xyz.acproject.danmuji.component.global.GlobalProperty>
+     */
+    @ResponseBody
+    @PostMapping("/modifyChatgpt")
+    public List<GlobalProperty> updateProperties(@RequestBody GlobalPropertieList globalPropertieList) {
+        // 替换原来的属性列表
+        GlobalProperties.setProperties(globalPropertieList.getProperties());
+        // 获取新的属性列表
+        List<GlobalProperty> propertiesz = GlobalProperties.getProperties();
+        return propertiesz;
     }
 
     @Autowired

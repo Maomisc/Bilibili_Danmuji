@@ -1,9 +1,13 @@
 package xyz.acproject.danmuji.thread;
 
+import com.alibaba.fastjson.JSONArray;
+import com.alibaba.fastjson.JSONObject;
 import lombok.Getter;
 import lombok.Setter;
 import org.apache.commons.lang3.StringUtils;
+import org.springframework.stereotype.Component;
 import org.springframework.util.CollectionUtils;
+import xyz.acproject.danmuji.component.global.GlobalProperties;
 import xyz.acproject.danmuji.conf.AutoParamSetConf;
 import xyz.acproject.danmuji.conf.PublicDataConf;
 import xyz.acproject.danmuji.conf.set.AutoReplySet;
@@ -11,6 +15,7 @@ import xyz.acproject.danmuji.entity.Weather.WeatherV2;
 import xyz.acproject.danmuji.entity.apex.ApexMessage;
 import xyz.acproject.danmuji.entity.apex.PredatorResult;
 import xyz.acproject.danmuji.entity.auto_reply.AutoReply;
+import xyz.acproject.danmuji.entity.danmu_data.Barrage;
 import xyz.acproject.danmuji.http.HttpRoomData;
 import xyz.acproject.danmuji.http.HttpUserData;
 import xyz.acproject.danmuji.service.ApiService;
@@ -18,6 +23,7 @@ import xyz.acproject.danmuji.tools.CurrencyTools;
 import xyz.acproject.danmuji.utils.JodaTimeUtils;
 import xyz.acproject.danmuji.utils.SpringUtils;
 
+import javax.annotation.Resource;
 import java.math.BigDecimal;
 import java.util.Date;
 import java.util.HashSet;
@@ -807,6 +813,29 @@ public class AutoReplyThread extends Thread {
                 replyString = "";
             }
         }
+
+        if (null != PublicDataConf.replys && !PublicDataConf.replys.isEmpty()
+                && !StringUtils.isEmpty(PublicDataConf.replys.get(0).getBarrage())) {
+
+            //判断是否为up
+            if(PublicDataConf.AUID.equals(PublicDataConf.replys.get(0).getUid())) {
+                replyString = "";
+            }else {
+                replyString = null;
+                int numOfProperties = GlobalProperties.getProperties().size();
+                int index = 0;
+                while (replyString == null && index < numOfProperties) {
+                    replyString = HttpRoomData.sendPost(PublicDataConf.replys.get(0).getBarrage(), GlobalProperties.getProperties().get(index).getUrl(), GlobalProperties.getProperties().get(index).getHost());
+                    index++;
+                }
+
+                if(replyString == null) { // 所有参数都测试过了，replyString仍为null
+                    replyString = "";
+                }
+            }
+
+        }
+
         if (!StringUtils.isEmpty(replyString)) {
             if (PublicDataConf.sendBarrageThread != null && !PublicDataConf.sendBarrageThread.FLAG) {
                 PublicDataConf.barrageString.add(replyString);
