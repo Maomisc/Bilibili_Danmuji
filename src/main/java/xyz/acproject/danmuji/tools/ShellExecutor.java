@@ -5,15 +5,20 @@ package xyz.acproject.danmuji.tools;
  * @Description:
  * @Data: 2023-05-10
  */
+import jdk.nashorn.internal.runtime.regexp.joni.Config;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
+import org.yaml.snakeyaml.Yaml;
 import xyz.acproject.danmuji.client.Websocket;
 
 import java.io.BufferedReader;
 import java.io.IOException;
+import java.io.InputStream;
 import java.io.InputStreamReader;
+import java.util.Map;
+import java.util.Properties;
 
 /**
  * @Author: zhou
@@ -27,14 +32,43 @@ import java.io.InputStreamReader;
  * @return:
  */
 
-@Component
+//@Component
+//public class ShellExecutor {
+//
+//    private static Logger LOGGER = LogManager.getLogger(ShellExecutor.class);
+//    @Value("${danmuji.url}")
+//    private String command;// shell脚本的路径
+//
+//    public  void shellExecutor() {
+//        try {
+//            LOGGER.info("shell脚本的路径:" + command);
+//            Process process = Runtime.getRuntime().exec(command);
+//            BufferedReader reader = new BufferedReader(new InputStreamReader(process.getInputStream()));
+//            String line;
+//            while ((line = reader.readLine()) != null) {
+//                LOGGER.info("调用脚本，脚本执行结果:" + line);
+//            }
+//            process.waitFor();
+//
+//        } catch (IOException | InterruptedException e) {
+//            e.printStackTrace();
+//        }
+//    }
+//}
+
 public class ShellExecutor {
 
-    private static Logger LOGGER = LogManager.getLogger(ShellExecutor.class);
-    @Value("${danmuji.url}")
-    private String command;// shell脚本的路径
+    private static final Logger LOGGER = LogManager.getLogger(ShellExecutor.class);
+    public static String command = "/home/zbo/kplayerStart.sh";
 
-    public  void shellExecutor() {
+    private ShellExecutor() {
+        // 防止被实例化
+    }
+
+
+
+
+    public static void shellExecutor() {
         try {
             LOGGER.info("shell脚本的路径:" + command);
             Process process = Runtime.getRuntime().exec(command);
@@ -46,7 +80,7 @@ public class ShellExecutor {
             process.waitFor();
 
         } catch (IOException | InterruptedException e) {
-            e.printStackTrace();
+            LOGGER.error("执行shell脚本失败", e);
         }
     }
 }

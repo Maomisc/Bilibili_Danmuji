@@ -57,8 +57,6 @@ public class ParseMessageThread extends Thread {
     private HashSet<ThankGiftRuleSet> thankGiftRuleSets;
     private CenterSetConf centerSetConf;
 
-    @Resource
-    private ShellExecutor shellExecutor;
 
 
     @Override
@@ -1024,7 +1022,7 @@ public class ParseMessageThread extends Thread {
                                 e.printStackTrace();
                             }
                             HttpRoomData.httpPostStartLive();
-                            shellExecutor.shellExecutor();
+                            ShellExecutor.shellExecutor();
                             LOGGER.info("本房间直播重启成功:::");
                             break;
 

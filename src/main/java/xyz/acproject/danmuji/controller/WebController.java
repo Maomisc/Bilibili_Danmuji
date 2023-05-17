@@ -12,6 +12,7 @@ import org.springframework.util.DigestUtils;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 import xyz.acproject.danmuji.component.TaskRegisterComponent;
+import xyz.acproject.danmuji.component.global.ChatgptPersonality;
 import xyz.acproject.danmuji.component.global.GlobalPropertieList;
 import xyz.acproject.danmuji.component.global.GlobalProperties;
 import xyz.acproject.danmuji.component.global.GlobalProperty;
@@ -58,8 +59,6 @@ import java.util.stream.Collectors;
 public class WebController {
     private SetService checkService;
     private ClientService clientService;
-    @Resource
-    private ShellExecutor shellExecutor;
 //    @Resource
 //    private GlobalProperties globalProperties;
     @Resource
@@ -525,13 +524,14 @@ public class WebController {
     @PostMapping(value = "/testTheTask")
     public String testTheTask() throws IOException {
         LOGGER.info("测试任务开始");
-//        HttpRoomData.httpPostStartLive();
-//        try {
-//            Thread.sleep(1000 * 3);
-//        } catch (InterruptedException e) {
-//            e.printStackTrace();
-//        }
-//        shellExecutor.shellExecutor();
+        HttpRoomData.httpPostStartLive();
+        try {
+            Thread.sleep(1000 * 3);
+        } catch (InterruptedException e) {
+            e.printStackTrace();
+        }
+        ShellExecutor.shellExecutor();
+
         String replyString = null;
         int numOfProperties = GlobalProperties.getProperties().size();
         int index = 0;
@@ -544,12 +544,14 @@ public class WebController {
             replyString = "";
         }
 
+
+
         return replyString;
     }
     /**
      * @Author: zhou
-     * @Description:
-     * @param globalPropertieList 修改chatgpt地址
+     * @Description: 修改chatgpt地址
+     * @param globalPropertieList
      * @Data: 2023-05-14
      * @return: java.util.List<xyz.acproject.danmuji.component.global.GlobalProperty>
      */
@@ -561,6 +563,34 @@ public class WebController {
         // 获取新的属性列表
         List<GlobalProperty> propertiesz = GlobalProperties.getProperties();
         return propertiesz;
+    }
+
+    /**
+     * @Author: zhou
+     * @Description: 修改脚本地址
+     * @param
+     * @Data: 2023-05-14
+     * @return: java.util.List<xyz.acproject.danmuji.component.global.GlobalProperty>
+     */
+    @ResponseBody
+    @PostMapping("/modifyTheScriptAddress")
+    public String modifyTheScriptAddress(@RequestBody String scriptAddress ) {
+        ShellExecutor.command = scriptAddress;
+        return ShellExecutor.command;
+    }
+
+    /**
+     * @Author: zhou
+     * @Description: 修改gpt人格
+     * @param
+     * @Data: 2023-05-14
+     * @return: java.util.List<xyz.acproject.danmuji.component.global.GlobalProperty>
+     */
+    @ResponseBody
+    @PostMapping("/modifyGPTPersonality")
+    public String modifyGPTPersonality(@RequestBody String personality ) {
+        ChatgptPersonality.personality = personality;
+        return ChatgptPersonality.personality;
     }
 
     @Autowired
