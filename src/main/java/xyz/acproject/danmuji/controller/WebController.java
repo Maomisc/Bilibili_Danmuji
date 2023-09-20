@@ -593,6 +593,33 @@ public class WebController {
         return ChatgptPersonality.personality;
     }
 
+    /**
+     * @Author: zhou
+     * @Description: 测试gpt请求
+     * @param
+     * @Data: 2023-05-14
+     * @return: java.util.List<xyz.acproject.danmuji.component.global.GlobalProperty>
+     */
+    @ResponseBody
+    @PostMapping("/testGptRequest")
+    public String testGptRequest(@RequestBody String personality ) {
+        String replyString = null;
+        int numOfProperties = GlobalProperties.getProperties().size();
+        int index = 0;
+        while (replyString == null && index < numOfProperties) {
+            replyString = HttpRoomData.sendPost(personality, GlobalProperties.getProperties().get(index).getUrl(), GlobalProperties.getProperties().get(index).getHost());
+            index++;
+        }
+
+        if(replyString == null) { // 所有参数都测试过了，replyString仍为null
+            replyString = "";
+        }
+
+
+
+        return replyString;
+    }
+
     @Autowired
     public void setCheckService(SetService checkService) {
         this.checkService = checkService;
